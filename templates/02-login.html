@@ -1,0 +1,28 @@
+{% extends "01-template.html" %}
+    {% block title %} Login page {%endblock%} 
+    {% block content %}
+        <form method="POST" action="/">
+            <label for="Email" class="form-group"> Email:</label>
+            <input type="email" name="email" placeholder="Email" required="True"> 
+                <br>
+            <label for="Password" class="form-group"> Password:</label>
+            <input type="password" name="password" placeholder="Password" required="True">
+                <br>
+            <button method="post" type="submit" class="form-group"> Login</button>
+        </form>
+    
+        <a href='/signup'><button> Sign up</button></a>
+        {% if error %}
+        <p style="color:red"> {{error}}</p>
+        {% endif %}
+    {%endblock%}
+        
+        
+
+
+        <script>
+            
+        </script>
+    </body>
+    
+</html>

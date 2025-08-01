@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8>"> 
+        <title>{% block title %} Tasks App {% endblock %}</title>
+    <!--<link rel="stylesheet" href="//styles/styles.css">-->
+    </head> 
+    <body>  
+        <header>
+            <h1>
+                Tasks App 
+                {% if session %}
+                <a href='/logout'><button> Logout</button></a>
+                {% endif %}
+            </h1>
+
+        </header>
+
+        <main>
+            {% block content %} {% endblock %}
+        </main>
+        <script>
+        
+        </script>
+    </body>
+    
+</html>

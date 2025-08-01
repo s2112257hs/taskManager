@@ -1,0 +1,12 @@
+{% extends "01-template.html" %}
+    {% block title %} Your profile {%endblock%} 
+    {% block content %}
+    <button id="show-form-btn"> Create Task </button>
+    <a href="/tasks"> <button> View your tasks</button></a>
+
+    <form id="create-task-form" style="display:none" method="POST" action="api/tasks">
+        
+    </form>
+
+    
+    {%endblock%}
