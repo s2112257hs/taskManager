@@ -1,12 +1,40 @@
 {% extends "01-template.html" %}
     {% block title %} Your profile {%endblock%} 
     {% block content %}
-    <button id="show-form-btn"> Create Task </button>
+    <div id="main-elements">
+    <button id="show-form-btn" onclick="openForm()"> Create Task </button>
     <a href="/tasks"> <button> View your tasks</button></a>
+    </div>
 
     <form id="create-task-form" style="display:none" method="POST" action="api/tasks">
-        
+        <label for="title">Title</label>
+        <input name="title" id="title" type="text" placeholder="title" required>
+        <br>
+        <label for="description">Description</label>
+        <input name="description" id="description" type="text" placeholder="description">
+        <br>       
+        <label for="due-date">Due date</label>
+        <input name="due-date" id="due-date" type="date" placeholder="due-date">
+        <br>   
+        <button type="button" id="discard-btn" onclick="closeForm()"> Discard </button>
+        <input type="reset" value="Reset">
+        <button type="submit"> Create task </button>
     </form>
+    {%endblock%}
 
-    
+    {% block scripts %}
+    <script>  
+        const create_task_form = document.getElementById("create-task-form");
+        const main_elements = document.getElementById("main-elements")
+        function openForm(){
+            create_task_form.style.display = "block";
+            main_elements.style.display = "none"
+        }
+
+        function closeForm(){
+            create_task_form.style.display = "none";
+            main_elements.style.display = "block"
+        }
+    </script>
+
     {%endblock%}

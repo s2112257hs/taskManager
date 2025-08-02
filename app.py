@@ -1,13 +1,15 @@
-from flask import Flask, render_template, redirect, url_for, request, session
+from flask import Flask, render_template, redirect, url_for, request, session, jsonify
 from dotenv import load_dotenv
 from supabase import Client, create_client
 from functools import wraps
+from datetime import timedelta
 import os  
 
 load_dotenv()
 
 app = Flask(__name__)
 app.secret_key = os.environ.get('SECRET_KEY')
+app.config["PERMANENT_SESSION_LIFETIME"] = timedelta(days=31)
 
 supabase: Client = create_client(os.environ.get('SUPABASE_URL'), os.environ.get('SUPABASE_KEY'))    
 
@@ -40,6 +42,7 @@ def login():
                     "email": email,
                     "password": password
                 })
+                session.permanent = True
                 session['user'] = result.user.id
                 return redirect(url_for('profile'))
             except Exception as e:
@@ -90,28 +93,20 @@ def logout():
 @login_required
 def create_task():
     title = request.form.get('title')
-    description = request.form.get('description')
-    status = request.form.get('status')
-    due_date = request.form.get('due-date')
-    user_id = session.get('user')
+    description = None if not request.form.get('description') else request.form.get('description')
+    due_date = None if not request.form.get('due-date') else request.form.get('due-date')
 
     task = {
         "title": title,
         "description": description,
-        "status": status,
         "due_date": due_date,
-        "user_id": user_id,
     }
 
-    response = supabase.table("tasks").insert(task).execute()
-    if response.status_code == 201:
-        return redirect(url_for('view_tasks'))
-    else:
-        return "Task creation failed", 400
-    
-
-
-    pass
+    try:
+        response = supabase.table("tasks").insert(task).execute()
+        return "Task created successfully", 201 
+    except Exception as e:
+        return jsonify({"Task failed": f"Error is the following: {e}"})
 @app.route("/api/tasks", methods=["GET"])
 @login_required
 def view_tasks():
@@ -126,7 +121,6 @@ def update_task():
 @login_required
 def delete_task():
     pass
-
 
 if __name__ == '__main__':
     app.run(debug=True)

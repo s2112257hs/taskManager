@@ -4,22 +4,22 @@
 
         <form method="POST" action="/signup">
             <label for="first name" class="form-group"> First name:</label>
-            <input type="first name" name="first-name" placeholder="First name" required="True">
+            <input type="first name" name="first-name" placeholder="First name" required>
                 <br>
             <label for="last name" class="form-group"> Last name:</label>
-            <input type="last name" name="last-name" placeholder="Last name" required="True"> 
+            <input type="last name" name="last-name" placeholder="Last name" required> 
                 <br>
             <label for="email" class="form-group"> Email:</label>
-            <input type="email" name="email" placeholder="email" required="True"> 
+            <input type="email" name="email" placeholder="email" required> 
             <br>
             <label for="password" class="form-group"> Password:</label>
-            <input type="password" name="password" placeholder="password" required="True">
+            <input type="password" name="password" placeholder="password" required>
                 <br>
             <label for="password" class="form-group"> Confirm password:</label>
-            <input type="password" name="confirm password" placeholder="confirm password" required="True">
+            <input type="password" name="confirm password" placeholder="confirm password" required>
                 <br>
 
-            <button method="post" type="submit" class="form-group"> Sign up</button>
+            <button type="submit" class="form-group"> Sign up</button>
         </form>
         {% if error %}
             <p style="color:red"> {{error}}</p>
