@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Task Manager</title>
+</head>
+<body>
+    <header>
+        <h1>Task Manager</h1>
+    </header>
+    <main>
+        <section>
+            <form id="taskForm" method="post">
+            <input type="text" id="taskTitle" placeholder="Task Title" required>
+            <input type="text" id="taskDescription" placeholder="Task Description">
+            <input type="date" id="taskDueDate" placeholder="Due Date">
+            <button type="submit">Add Task</button>
+            </form>
+        </section>
+        <section>
+            <ul id="taskList"></ul>
+        </section>
+    </main>
+    <script>
+        document.getElementById('taskForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const title= document.getElementById('taskTitle');
+            const description = document.getElementById('taskDescription');
+            const dueDate = document.getElementById('taskDueDate');
+
+            const response = await fetch("http://127.0.0.1:5000/api/tasks",{ 
+                method:"POST",
+                headers: {"Content-Type": "application/json"},
+                body: JSON.stringify({title, description, dueDate})
+            })
+            
+            const data = await response.json();
+            if (data.success === "True"){
+                alert("Task added successfully")
+            }
+            else{
+                alert(data.error)
+            }
+        })
+    </script>
+</body>
+</html>
