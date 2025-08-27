@@ -11,31 +11,15 @@ load_dotenv()
 
 app = Flask(__name__)
 CORS(app)
-app.secret_key = os.environ.get('SECRET_KEY')
-app.config["PERMANENT_SESSION_LIFETIME"] = timedelta(days=31)
+#Setup Json web token
+app.config["JWT_SECRET_KEY"] = os.getenv("JWT_SECRET_KEY")
 jwt = JWTManager(app)
 
 supabase: Client = create_client(os.environ.get('SUPABASE_URL'), os.environ.get('SUPABASE_KEY'))    
 
-def login_required(f):
-    @wraps(f)
-    def decorated_function(*args, **kwargs):
-        if 'user' not in session:
-            return jsonify({"status": "error", "error": "User is not logged in", "redirect":"/login"}), 401
-        return f(*args, **kwargs)
-    return decorated_function
-
-def redirect_if_logged_in(f): 
-    @wraps(f)
-    def decorated_function(*args, **kwargs):
-        if 'user' in session:
-            return jsonify({"status":"error", "error": "user already logged in", "redirect": "/profile"}), 403
-        return f(*args, **kwargs)
-    return decorated_function 
 
 
 @app.route("/api/login", methods=['POST'])
-@redirect_if_logged_in
 def login(): 
     data = request.get_json()   
     email = data.get("email")
@@ -47,17 +31,17 @@ def login():
             "email": email,
             "password": password
         })
+        if not result:
+            return jsonify({"error":"Invalid credentials"})
         
-        session.permanent = True
-        session['user'] = result.user.id
-        return jsonify({"message":"Login successful", "user_id": result.user.id, "redirect":"/frontend/index.html"})
+        token = create_access_token(identity=result.user.id)
+        return jsonify({"token":token, "user_id": result.user.id, "redirect":"/frontend/index.html"})
     except Exception as e:
         app.logger.error(f"login failed: {e}")
         return jsonify({"Error": "could not login"}), 401
 
 
 @app.route("/api/signup", methods=['POST'])
-@redirect_if_logged_in
 def signup():
     first_name = request.form.get('first-name')
     last_name = request.form.get('last-name')
@@ -75,11 +59,10 @@ def signup():
                 "email": email,
                 "password": password
             })
-            return jsonify({"message":"Sign up successful, please login", "redirect": "/login"})
+            return jsonify({"message":"Sign up successful, please login", "redirect": "/frontend/login.html"})
         except Exception as e:
             app.logger.error(f"login failed: {e}")
-            return render_template('03-signup.html', error=e)
-
+            return jsonify({"error":"Sign up failed"})
 
 @app.route("/api/logout")
 def logout():
@@ -88,7 +71,7 @@ def logout():
 
 
 @app.route("/api/tasks", methods=["POST"]) 
-@login_required
+@jwt_required()
 def create_task():
     data = request.get_json
     title = data.get('title')
@@ -111,17 +94,17 @@ def create_task():
         return jsonify({"error": f"Error is the following: {e}"})
 
 @app.route("/api/tasks", methods=["GET"])
-@login_required
+@jwt_required()
 def view_tasks():
     pass
 
 @app.route("/api/tasks", methods=["PUT"])
-@login_required
+@jwt_required()
 def update_task():
     pass
 
 @app.route("/api/tasks", methods=["DELETE"])
-@login_required
+@jwt_required()
 def delete_task():
     pass
 
