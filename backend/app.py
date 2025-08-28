@@ -31,14 +31,14 @@ def login():
             "email": email,
             "password": password
         })
-        if not result:
-            return jsonify({"error":"Invalid credentials"})
+        if not result.user:
+            return jsonify({"error":"Invalid credentials"}), 401
         
         token = create_access_token(identity=result.user.id)
-        return jsonify({"token":token, "user_id": result.user.id, "redirect":"/frontend/index.html"})
+        return jsonify({"token":token, "user_id": result.user.id, "redirect":"/frontend/index.html"}), 200
     except Exception as e:
         app.logger.error(f"login failed: {e}")
-        return jsonify({"Error": "could not login"}), 401
+        return jsonify({"error": "could not login"}), 500
 
 
 @app.route("/api/signup", methods=['POST'])
@@ -73,7 +73,7 @@ def logout():
 @app.route("/api/tasks", methods=["POST"]) 
 @jwt_required()
 def create_task():
-    data = request.get_json
+    data = request.get_json()
     title = data.get('title')
     description = None if not data.get('description') else data.get('description')
     due_date = None if not data.get('dueDate') else data.get('dueDate')
@@ -88,10 +88,11 @@ def create_task():
     }
 
     try:
-        response = supabase.table("tasks").insert(task).execute()
+        response = supabase.table("tasks").insert([task]).execute()
         return jsonify({"success":"True"}), 201 
     except Exception as e:
-        return jsonify({"error": f"Error is the following: {e}"})
+        app.logger.error(f"login failed: {e}")
+        return jsonify({"error": "Could not create task"})
 
 @app.route("/api/tasks", methods=["GET"])
 @jwt_required()

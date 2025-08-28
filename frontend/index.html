@@ -23,20 +23,48 @@
         </section>
     </main>
     <script>
+        function checkAuth() {
+        const token = localStorage.getItem("token");
+        if (!token) {
+            window.location.href = "/frontend/login.html";
+            return;
+        }
+
+        const payload = JSON.parse(atob(token.split('.')[1]));
+        const now = Math.floor(Date.now() / 1000);
+        if (payload.exp && payload.exp < now) {
+            localStorage.removeItem("token"); 
+            window.location.href = "/frontend/login.html";
+        }
+        }
+        checkAuth();
+
+        async function apiRequest(url, options = {}){
+            const token = localStorage.getItem("token");
+            if (!options.headers){
+                options.headers = {}
+            }
+            if (token){
+                options.headers["Authorization"] = `Bearer ${token}`
+            }
+            const response = await fetch(url, options);
+            return response;
+        }
+
         document.getElementById('taskForm').addEventListener('submit', async (e) => {
             e.preventDefault();
-            const title= document.getElementById('taskTitle');
-            const description = document.getElementById('taskDescription');
-            const dueDate = document.getElementById('taskDueDate');
+            const title= document.getElementById('taskTitle').value;
+            const description = document.getElementById('taskDescription').value;
+            const dueDate = document.getElementById('taskDueDate').value;
 
-            const response = await fetch("http://127.0.0.1:5000/api/tasks",{ 
+            const response = await apiRequest("http://127.0.0.1:5000/api/tasks",{ 
                 method:"POST",
                 headers: {"Content-Type": "application/json"},
                 body: JSON.stringify({title, description, dueDate})
             })
             
             const data = await response.json();
-            if (data.success === "True"){
+            if (data.success){
                 alert("Task added successfully")
             }
             else{

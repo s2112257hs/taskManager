@@ -28,8 +28,9 @@
             
             })
             const data = await response.json();
-            if (data.redirect){
-                window.location.href = data.redirect   
+            if (data.token){
+                localStorage.setItem("token", data.token);
+                window.location.href = data.redirect;
             }
             else{
                 alert(data.error)
