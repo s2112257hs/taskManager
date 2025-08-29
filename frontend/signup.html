@@ -8,7 +8,7 @@
 <body>
     <div>
         <h1>Sign Up</h1>
-        <form>
+        <form id="signupForm">
             <div>
                 <label for="fname">First Name</label>
                 <input type="text" id="fname" name="fname" autocomplete="given-name" required>
@@ -32,5 +32,28 @@
             <button type="submit">Create Account</button>
         </form>
     </div>
+    <script>
+        document.getElementById('signupForm').addEventListener("submit", async (e) => {
+            e.preventDefault();
+            const firstName = document.getElementById('fname').value;
+            const lastName = document.getElementById('lname').value;
+            const email = document.getElementById("email").value;
+            const password = document.getElementById("pass").value; 
+            const confirmPassword = document.getElementById("cpass").value; 
+
+            const response = await fetch("http://127.0.0.1:5000/api/signup", {
+            method:"POST",
+            headers: {"Content-Type": "application/json"},
+            body: JSON.stringify({firstName, lastName, email, password, confirmPassword}),
+            })
+            const data = await response.json();
+            if (data.redirect){
+                window.location.href = data.redirect;
+            }
+            else{
+                alert(data.error)
+            }
+        });
+    </script>
 </body>
 </html>

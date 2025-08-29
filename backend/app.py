@@ -44,11 +44,13 @@ def login():
 
 @app.route("/api/signup", methods=['POST'])
 def signup():
-    first_name = request.form.get('first-name')
-    last_name = request.form.get('last-name')
-    email = request.form.get('email')
-    password = request.form.get('password')
-    confirmed_password = request.form.get('confirm-password')
+    data = request.get_json()
+
+    first_name = data.get('firstName')
+    last_name = data.get('lastName')
+    email = data.get('email')
+    password = data.get('password')
+    confirmed_password = data.get('confirmPassword')
     if not (first_name and last_name and email and password and confirmed_password):
         return jsonify({"error": "Missing credentials"}), 400
     
@@ -63,12 +65,12 @@ def signup():
             return jsonify({"message":"Sign up successful, please login", "redirect": "/frontend/login.html"})
         except Exception as e:
             app.logger.error(f"login failed: {e}")
-            return jsonify({"error":"Sign up failed"})
+            return jsonify({"error":"Sign up failed"}), 402
 
 @app.route("/api/logout")
 def logout():
     session.clear()
-    return jsonify({"message":"Logout successful", "redirect":"/frontend/login.html"})
+    return jsonify({"message":"Logout successful", "redirect":"/frontend/login.html"}), 200
 
 
 @app.route("/api/tasks", methods=["POST"]) 
