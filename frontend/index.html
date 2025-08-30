@@ -69,10 +69,7 @@
             })
             
             const data = await response.json();
-            if (data.success){
-                alert("Task added successfully")
-            }
-            else{
+            if (data.error){
                 alert(data.error)
             }
         })
@@ -80,7 +77,57 @@
         async function renderTasks(){
             const response = await apiRequest("http://127.0.0.1:5000/api/tasks", {method: "GET"});
             const data = await response.json();
-            console.log(data);
+            console.log(data)
+            const taskList = document.getElementById('taskList');
+            taskList.innerHTML = '';
+            data.forEach(task => {
+                const li = document.createElement("li");
+                li.innerHTML = `<span class='title'> ${task.title ?? ""} <span> |
+                                <span class='description'> ${task.description ?? ""} <span> |
+                                <span class='dueDate'> ${task.due_date ?? ""} <span> |
+                                <button class=editBtn> Edit </button>
+                                <button class='deleteBtn'> Delete </button>`;
+                
+                li.querySelector('.deleteBtn').addEventListener('click', async ()=> {
+                    const response = await apiRequest(`http://127.0.0.1:5000/api/tasks/${task.id}`,{
+                        method:"Delete"
+                    })
+                    const data = await response.json();
+                    if (data.error){
+                        alert(data.error)
+                    }
+                })
+                
+                li.querySelector('.editBtn').addEventListener('click', ()=>{
+                    li.innerHTML = `<input class='edit-title' value='${task.title ?? ""}'>|
+                                    <input class='edit-description' value='${task.description ?? ""}'>|
+                                    <input class='edit-dueDate'type='date' value='${task.due_date ?? ""}'>|
+                                    <button class='saveBtn'> Save </button>
+                                    <button class='cancelBtn'> Cancel </button>`;
+                    
+                    li.querySelector('.cancelBtn').addEventListener('click', ()=>{
+                        renderTasks();
+                    })
+
+                    li.querySelector('.saveBtn').addEventListener('click', async () =>{
+                        const title = li.querySelector('.edit-title').value;
+                        const description = li.querySelector('.edit-description').value;
+                        const due_date = li.querySelector('.edit-dueDate').value;
+
+                        const response = await apiRequest(`http://127.0.0.1:5000/api/tasks/${task.id}`,{
+                            method:"PUT",
+                            headers: {"Content-Type": "application/json"},
+                            body: JSON.stringify({title, description, dueDate})
+                        })
+
+                        const data = await response.json();
+                        if (data.error){
+                            alert(data.error);
+                        }
+                    })
+                })
+                taskList.appendChild(li);                       
+            })
         }
         renderTasks()
     </script>

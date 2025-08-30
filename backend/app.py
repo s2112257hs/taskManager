@@ -101,7 +101,7 @@ def create_task():
 @jwt_required()
 def view_tasks():
     try:
-        response = supabase.table("tasks").select("title", "description", "due_date").execute()
+        response = supabase.table("tasks").select("id", "title", "description", "due_date").execute()
         return jsonify(response.data), 200
 
     except Exception as e:
@@ -109,15 +109,14 @@ def view_tasks():
         return jsonify({"error": "Could not retrieve your tasks"}), 500
     
 
-@app.route("/api/tasks", methods=["PUT"])
+@app.route("/api/tasks/{task_id}", methods=["PUT"])
 @jwt_required()
-def update_task():
+def update_task(task_id):
     try:
         data = request.get_json()
         title = None if not data.get('title') else data.get('title')
         description = None if not data.get('description') else data.get('description')
         due_date = None if not data.get('dueDate') else data.get('dueDate')
-        task_id = data.get("taskId")
 
         task = {
             "title": title,
@@ -129,9 +128,9 @@ def update_task():
         app.logger.error(f"PUT request failed:{e}")
         return jsonify({"error":"Could not update task. Please try again"})
 
-@app.route("/api/tasks", methods=["DELETE"])
+@app.route("/api/tasks/{task_id}", methods=["DELETE"])
 @jwt_required()
-def delete_task():
+def delete_task(task_id):
     try:
         pass
     except Exception as e:
