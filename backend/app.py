@@ -62,15 +62,11 @@ def signup():
                 "email": email,
                 "password": password
             })
-            return jsonify({"message":"Sign up successful, please login", "redirect": "/frontend/login.html"})
+            return jsonify({"message":"Sign up successful, please login", "redirect": "/frontend/login.html"}), 200
         except Exception as e:
             app.logger.error(f"login failed: {e}")
-            return jsonify({"error":"Sign up failed"}), 402
+            return jsonify({"error":"Sign up failed"}), 500
 
-@app.route("/api/logout")
-def logout():
-    session.clear()
-    return jsonify({"message":"Logout successful", "redirect":"/frontend/login.html"}), 200
 
 
 @app.route("/api/tasks", methods=["POST"]) 
@@ -82,7 +78,7 @@ def create_task():
     due_date = None if not data.get('dueDate') else data.get('dueDate')
 
     if not title:
-        return jsonify({"error":"title required"})
+        return jsonify({"error":"title required"}), 400
 
     task = {
         "title": title,
@@ -92,10 +88,10 @@ def create_task():
 
     try:
         response = supabase.table("tasks").insert([task]).execute()
-        return jsonify({"success":"True"}), 201 
+        return jsonify({"success":"True"}), 200
     except Exception as e:
         app.logger.error(f"login failed: {e}")
-        return jsonify({"error": "Could not create task"})
+        return jsonify({"error": "Could not create task"}), 500
 
 @app.route("/api/tasks", methods=["GET"])
 @jwt_required()
@@ -109,7 +105,7 @@ def view_tasks():
         return jsonify({"error": "Could not retrieve your tasks"}), 500
     
 
-@app.route("/api/tasks/{task_id}", methods=["PUT"])
+@app.route("/api/tasks/<task_id>", methods=["PUT"])
 @jwt_required()
 def update_task(task_id):
     try:
@@ -118,24 +114,31 @@ def update_task(task_id):
         description = None if not data.get('description') else data.get('description')
         due_date = None if not data.get('dueDate') else data.get('dueDate')
 
+        if not title:
+            return jsonify({"error":"Title is required"}), 400
+
         task = {
             "title": title,
             "description": description,
             "due_date": due_date,
         }
+        response = supabase.table("tasks").update(task).eq("id", task_id).execute()
+        return jsonify({"success":"True"}), 200
+
 
     except Exception as e:
         app.logger.error(f"PUT request failed:{e}")
-        return jsonify({"error":"Could not update task. Please try again"})
+        return jsonify({"error":"Could not update task. Please try again"}), 500
 
-@app.route("/api/tasks/{task_id}", methods=["DELETE"])
+@app.route("/api/tasks/<task_id>", methods=["DELETE"])
 @jwt_required()
 def delete_task(task_id):
     try:
-        pass
+        response = supabase.table("tasks").delete().eq("id", task_id).execute()
+        return jsonify({"success":"True"}), 200
     except Exception as e:
         app.logger.error(f"DELETE request failed:{e}")
-        return jsonify({"error":"Could not delete task. Please try again"})
+        return jsonify({"error":"Could not delete task. Please try again"}), 500
 
 if __name__ == '__main__':
     app.run(debug=True)

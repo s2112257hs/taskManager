@@ -24,27 +24,39 @@
         </section>
     </main>
     <script>
-        document.getElementById('logoutBtn').addEventListener('click', function() {
+        document.getElementById('logoutBtn').addEventListener('click', () => {
             localStorage.removeItem('token');
             window.location.href = "login.html";
         });
         function checkAuth() {
-        const token = localStorage.getItem("token");
-        if (!token) {
-            window.location.href = "login.html";
-            return;
-        }
+            const token = localStorage.getItem("token");
+            if (!token) {
+                window.location.href = "login.html";
+                return false;
+            }
+            try {
+                const payload = JSON.parse(atob(token.split('.')[1]));
+                const now = Math.floor(Date.now() / 1000);
+                if (payload.exp && payload.exp < now) {
+                    localStorage.removeItem("token"); 
+                    window.location.href = "login.html";
+                    return false
+                }
+                return true
+            }
+            
+            catch(e){
+                localStorage.removeItem("token");
+                return false;
 
-        const payload = JSON.parse(atob(token.split('.')[1]));
-        const now = Math.floor(Date.now() / 1000);
-        if (payload.exp && payload.exp < now) {
-            localStorage.removeItem("token"); 
-            window.location.href = "login.html";
+            }
         }
-        }
-        checkAuth();
 
         async function apiRequest(url, options = {}){
+            checkAuth();
+            if (!checkAuth()){
+                return
+            }
             const token = localStorage.getItem("token");
             if (!options.headers){
                 options.headers = {}
@@ -72,6 +84,7 @@
             if (data.error){
                 alert(data.error)
             }
+            renderTasks();
         })
 
         async function renderTasks(){
@@ -82,20 +95,21 @@
             taskList.innerHTML = '';
             data.forEach(task => {
                 const li = document.createElement("li");
-                li.innerHTML = `<span class='title'> ${task.title ?? ""} <span> |
-                                <span class='description'> ${task.description ?? ""} <span> |
-                                <span class='dueDate'> ${task.due_date ?? ""} <span> |
+                li.innerHTML = `<span class='title'> ${task.title ?? ""} </span> |
+                                <span class='description'> ${task.description ?? ""} </span> |
+                                <span class='dueDate'> ${task.due_date ?? ""} </span> |
                                 <button class=editBtn> Edit </button>
                                 <button class='deleteBtn'> Delete </button>`;
                 
                 li.querySelector('.deleteBtn').addEventListener('click', async ()=> {
                     const response = await apiRequest(`http://127.0.0.1:5000/api/tasks/${task.id}`,{
-                        method:"Delete"
+                        method:"DELETE"
                     })
                     const data = await response.json();
                     if (data.error){
                         alert(data.error)
                     }
+                    renderTasks();
                 })
                 
                 li.querySelector('.editBtn').addEventListener('click', ()=>{
@@ -112,7 +126,7 @@
                     li.querySelector('.saveBtn').addEventListener('click', async () =>{
                         const title = li.querySelector('.edit-title').value;
                         const description = li.querySelector('.edit-description').value;
-                        const due_date = li.querySelector('.edit-dueDate').value;
+                        const dueDate = li.querySelector('.edit-dueDate').value;
 
                         const response = await apiRequest(`http://127.0.0.1:5000/api/tasks/${task.id}`,{
                             method:"PUT",
@@ -124,12 +138,14 @@
                         if (data.error){
                             alert(data.error);
                         }
+                        renderTasks();
                     })
                 })
                 taskList.appendChild(li);                       
             })
         }
-        renderTasks()
+        checkAuth();
+        renderTasks();
     </script>
 </body>
 </html>
