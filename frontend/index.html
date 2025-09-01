@@ -15,6 +15,10 @@
                 <input type="text" id="taskTitle" placeholder="Task Title" required>
                 <input type="text" id="taskDescription" placeholder="Task Description">
                 <input type="date" id="taskDueDate" placeholder="Due Date">
+                <select id="taskStatus"> 
+                    <option value="pending">Pending</option>
+                    <option value="completed">Completed</option>
+                </select>
                 <button type="submit">Add Task</button>
             </form>
             <button id="logoutBtn">Logout</button>
@@ -64,20 +68,39 @@
             if (token){
                 options.headers["Authorization"] = `Bearer ${token}`
             }
-            const response = await fetch(url, options);
-            return response;
+            try{
+                const response = await fetch(url, options);
+                if (!response.ok){
+                    if (response.status === 401 || response.status === 403 || response.status >= 500){
+                        localStorage.removeItem('token');
+                        window.location.href = 'login.html';
+                        return
+                    }
+                }
+                return response;
+            }
+            catch(error){
+                localStorage.removeItem('token');
+                window.location.href = 'login.html';
+            }
         }
-
-        document.getElementById('taskForm').addEventListener('submit', async (e) => {
+        const taskForm = document.getElementById('taskForm');
+        taskForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             const title= document.getElementById('taskTitle').value;
             const description = document.getElementById('taskDescription').value;
             const dueDate = document.getElementById('taskDueDate').value;
+            const status = document.getElementById('taskStatus').value;
+            taskForm.reset();
+
+            if (!title){
+                alert("Title required")
+            }
 
             const response = await apiRequest("http://127.0.0.1:5000/api/tasks",{ 
                 method:"POST",
                 headers: {"Content-Type": "application/json"},
-                body: JSON.stringify({title, description, dueDate})
+                body: JSON.stringify({title, description, dueDate, status})
             })
             
             const data = await response.json();
@@ -98,6 +121,7 @@
                 li.innerHTML = `<span class='title'> ${task.title ?? ""} </span> |
                                 <span class='description'> ${task.description ?? ""} </span> |
                                 <span class='dueDate'> ${task.due_date ?? ""} </span> |
+                                <span class='status'> ${task.status} </span>
                                 <button class=editBtn> Edit </button>
                                 <button class='deleteBtn'> Delete </button>`;
                 
@@ -113,9 +137,13 @@
                 })
                 
                 li.querySelector('.editBtn').addEventListener('click', ()=>{
-                    li.innerHTML = `<input class='edit-title' value='${task.title ?? ""}'>|
+                    li.innerHTML = `<input class='edit-title' required value='${task.title ?? ""}'>|
                                     <input class='edit-description' value='${task.description ?? ""}'>|
                                     <input class='edit-dueDate'type='date' value='${task.due_date ?? ""}'>|
+                                    <select class='status'> 
+                                        <option value="pending">Pending</option>
+                                        <option value="completed">Completed</option>
+                                    </select>
                                     <button class='saveBtn'> Save </button>
                                     <button class='cancelBtn'> Cancel </button>`;
                     
@@ -127,11 +155,15 @@
                         const title = li.querySelector('.edit-title').value;
                         const description = li.querySelector('.edit-description').value;
                         const dueDate = li.querySelector('.edit-dueDate').value;
+                        const status = li.querySelector('.status').value
 
+                        if (!title){
+                            alert("Title required")
+                        }
                         const response = await apiRequest(`http://127.0.0.1:5000/api/tasks/${task.id}`,{
                             method:"PUT",
                             headers: {"Content-Type": "application/json"},
-                            body: JSON.stringify({title, description, dueDate})
+                            body: JSON.stringify({title, description, dueDate, status})
                         })
 
                         const data = await response.json();

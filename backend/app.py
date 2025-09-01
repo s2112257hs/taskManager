@@ -1,12 +1,9 @@
-from flask import Flask, render_template, redirect, url_for, request, session, jsonify
+from flask import Flask, request, jsonify
 from dotenv import load_dotenv
 from supabase import Client, create_client
-from functools import wraps
-from datetime import timedelta
 import os  
 from flask_cors import CORS
 from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity
-import uuid
 
 load_dotenv()
 
@@ -76,6 +73,7 @@ def create_task():
     title = data.get('title')
     description = None if not data.get('description') else data.get('description')
     due_date = None if not data.get('dueDate') else data.get('dueDate')
+    status = 'pending' if not data.get('status') else data.get('status')
 
     if not title:
         return jsonify({"error":"title required"}), 400
@@ -84,6 +82,7 @@ def create_task():
         "title": title,
         "description": description,
         "due_date": due_date,
+        "status": status,
     }
 
     try:
@@ -97,7 +96,7 @@ def create_task():
 @jwt_required()
 def view_tasks():
     try:
-        response = supabase.table("tasks").select("id", "title", "description", "due_date").execute()
+        response = supabase.table("tasks").select("id", "title", "description", "due_date","status").execute()
         return jsonify(response.data), 200
 
     except Exception as e:
@@ -113,6 +112,7 @@ def update_task(task_id):
         title = None if not data.get('title') else data.get('title')
         description = None if not data.get('description') else data.get('description')
         due_date = None if not data.get('dueDate') else data.get('dueDate')
+        status = "pending" if not data.get('status') else data.get('status')
 
         if not title:
             return jsonify({"error":"Title is required"}), 400
@@ -121,6 +121,7 @@ def update_task(task_id):
             "title": title,
             "description": description,
             "due_date": due_date,
+            "status": status,
         }
         response = supabase.table("tasks").update(task).eq("id", task_id).execute()
         return jsonify({"success":"True"}), 200
