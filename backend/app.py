@@ -16,6 +16,9 @@ jwt = JWTManager(app)
 supabase: Client = create_client(os.environ.get('SUPABASE_URL'), os.environ.get('SUPABASE_KEY'))    
 
 
+@app.route("/api/ping", methods=["GET"])
+def ping():
+    return jsonify({"message": "pong"}), 200
 
 @app.route("/api/login", methods=['POST'])
 def login(): 
