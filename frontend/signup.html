@@ -25,48 +25,6 @@
         <button type="submit" class="btn btn-primary">Create Account</button>
     </form>
     <p>Already have an account? <a href="login.html" class="link-primary">Log in</a></p>
-    <script>
-        function showError(message) {
-            const errorBox = document.getElementById('errorBox');
-            errorBox.textContent = message;
-            errorBox.classList.remove('d-none');
-            setTimeout(() => errorBox.classList.add('d-none'), 5000);
-        }
-
-        document.getElementById('signupForm').addEventListener("submit", async (e) => {
-            e.preventDefault();
-            const email = document.getElementById("email").value;
-            const password = document.getElementById("pass").value;
-            const confirmPassword = document.getElementById("cpass").value;
-
-            if (!email || !password) {
-                showError("Email and password are required");
-                return;
-            }
-            if (password !== confirmPassword) {
-                showError("Passwords do not match");
-                return;
-            }
-
-            try {
-                const response = await fetch("http://127.0.0.1:5000/api/signup", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ email, password, confirmPassword }),
-                });
-                if (!response.ok) {
-                    const data = await response.json();
-                    showError(data.error || "Sign up failed. Please try again.");
-                    return;
-                }
-                const data = await response.json();
-                if (data.redirect) {
-                    window.location.href = data.redirect;
-                }
-            } catch (error) {
-                showError("Unable to connect to the server. Please try again later.");
-            }
-        });
-    </script>
+    <script type="module" src="./scripts/signup.js"> </script>
 </body>
 </html>
