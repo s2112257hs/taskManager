@@ -23,7 +23,7 @@ To explore the live demo without creating a new account:
 
 -   **Email:** `user@gmail.com`
 -   **Password:** `password`
-
+ 
 ------------------------------------------------------------------------
 
 ## 🛠️ Tech Stack
