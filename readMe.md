@@ -10,9 +10,9 @@ Bootstrap frontend**.
 
 ## 🚀 Features
 
--   User authentication (signup/login with JWT)\
--   Secure task management (CRUD: create, read, update, delete)\
--   Each task linked to the logged-in user\
+-   User authentication (signup/login with JWT)
+-   Secure task management (CRUD: create, read, update, delete)
+-   Each task linked to the logged-in user
 -   Clean Bootstrap UI with responsive design
 
 ------------------------------------------------------------------------
@@ -21,7 +21,7 @@ Bootstrap frontend**.
 
 To explore the live demo without creating a new account:
 
--   **Email:** `user@gmail.com`\
+-   **Email:** `user@gmail.com`
 -   **Password:** `password`
 
 ------------------------------------------------------------------------
@@ -29,13 +29,12 @@ To explore the live demo without creating a new account:
 ## 🛠️ Tech Stack
 
 -   **Backend:** Flask\
--   **Frontend:** Vanilla JavaScript, Bootstrap 5\
+-   **Frontend:** Vanilla JavaScript, Bootstrap 5
 -   **Auth & DB:** Supabase (Postgres + Auth)
 
 ------------------------------------------------------------------------
 
 ## 📌 Possible Future Improvements
 
--   Task filtering and search\
--   User profile management\
+-   Task filtering and search
 -   React frontend upgrade
