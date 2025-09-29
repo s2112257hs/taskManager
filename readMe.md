@@ -28,7 +28,7 @@ To explore the live demo without creating a new account:
 
 ## 🛠️ Tech Stack
 
--   **Backend:** Flask\
+-   **Backend:** Flask
 -   **Frontend:** Vanilla JavaScript, Bootstrap 5
 -   **Auth & DB:** Supabase (Postgres + Auth)
 
