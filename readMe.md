@@ -1,14 +1,14 @@
-# Task Manager App ✅
+# Task Manager App 
 
 A full-stack task management application built with **Flask (Python)**,
 **Supabase**, **JWT authentication**, and a **vanilla JavaScript +
 Bootstrap frontend**.
 
-👉 [Live Demo](https://task-manager-ten-red-75.vercel.app)
+ [Live Demo](https://task-manager-ten-red-75.vercel.app)
 
 ------------------------------------------------------------------------
 
-## 🚀 Features
+##  Features
 
 -   User authentication (signup/login with JWT)
 -   Secure task management (CRUD: create, read, update, delete)
@@ -17,7 +17,7 @@ Bootstrap frontend**.
 
 ------------------------------------------------------------------------
 
-## 🔑 Demo Login Credentials
+##  Demo Login Credentials
 
 To explore the live demo without creating a new account:
 
@@ -26,7 +26,7 @@ To explore the live demo without creating a new account:
  
 ------------------------------------------------------------------------
 
-## 🛠️ Tech Stack
+##  Tech Stack
 
 -   **Backend:** Flask
 -   **Frontend:** Vanilla JavaScript, Bootstrap 5
@@ -34,7 +34,7 @@ To explore the live demo without creating a new account:
 
 ------------------------------------------------------------------------
 
-## 📌 Possible Future Improvements
+##  Possible Future Improvements
 
 -   Task filtering and search
 -   React frontend upgrade
